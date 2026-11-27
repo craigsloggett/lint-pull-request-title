@@ -1,39 +1,37 @@
-# composite-action-template
+# lint-pull-request-title
 
-A GitHub repository template for creating a new Composite Action.
+A composite action for linting pull request titles.
 
-> Composite actions allow you to collect a series of workflow job steps into a single action which you can then run as a single job step in multiple workflows.
+Titles must follow the [Conventional Commits](https://www.conventionalcommits.org) specification, such as `feat: Add an input` or `chore(ci): Bump actions/checkout`. A scope is optional.
 
 ## Usage
 
 ```yaml
-name: Lint
+name: Pre-release
 
-on: pull_request
+on:
+  pull_request:
+    types:
+      - opened
+      - edited
+      - synchronize
 
 permissions:
-  contents: read
+  pull-requests: read
 
 jobs:
-  my-job:
-    name: My Job
+  title:
+    name: Semantic Title
     runs-on: ubuntu-24.04
     steps:
-      - name: Checkout
-        uses: actions/checkout@v6
-
-      - name: Use Composite Action
-        uses: craigsloggett-lab/my-composite-action@v1
+      - name: Lint Pull Request Title
+        uses: craigsloggett/lint-pull-request-title@v1
 ```
+
+Trigger on `pull_request` rather than `pull_request_target`. The action only reads the pull request, so the read-only token that `pull_request` grants to forks and Dependabot is enough.
 
 ### Inputs
 
-| Input            | Required? | Default                    | Description                                        |
-| ---------------- | --------- | -------------------------- | -------------------------------------------------- |
-| `my-input`       | `false`   | `The default description.` | This is my input, there is no other input like it. |
-
-### Outputs
-
-| Output      | Description                                |
-| ----------- | ------------------------------------------ |
-| `my-output` | The output this composite action produces. |
+| Input   | Required? | Default               | Description                                     |
+| ------- | --------- | --------------------- | ----------------------------------------------- |
+| `token` | `false`   | `${{ github.token }}` | The GitHub token used to read the pull request. |
